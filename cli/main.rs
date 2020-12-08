@@ -405,6 +405,7 @@ fn bundle_module_graph(
     module_graph.bundle(module_graph::BundleOptions {
       debug,
       maybe_config_path: flags.config_path,
+      minify: flags.minify,
     })?;
   match maybe_ignored_options {
     Some(ignored_options) if flags.no_check => {

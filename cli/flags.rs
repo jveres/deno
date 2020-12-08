@@ -115,6 +115,7 @@ pub struct Flags {
   pub lock: Option<PathBuf>,
   pub lock_write: bool,
   pub log_level: Option<Level>,
+  pub minify: bool,
   pub net_allowlist: Vec<String>,
   pub no_check: bool,
   pub no_prompts: bool,
@@ -539,6 +540,7 @@ fn compile_args<'a, 'b>(app: App<'a, 'b>) -> App<'a, 'b> {
     .arg(lock_arg())
     .arg(lock_write_arg())
     .arg(ca_file_arg())
+    .arg(minify_arg())
 }
 
 fn compile_args_parse(flags: &mut Flags, matches: &clap::ArgMatches) {
@@ -549,6 +551,7 @@ fn compile_args_parse(flags: &mut Flags, matches: &clap::ArgMatches) {
   reload_arg_parse(flags, matches);
   lock_args_parse(flags, matches);
   ca_file_arg_parse(flags, matches);
+  minify_arg_parse(flags, matches);
 }
 
 fn runtime_args<'a, 'b>(app: App<'a, 'b>, include_perms: bool) -> App<'a, 'b> {
@@ -1332,8 +1335,20 @@ fn ca_file_arg<'a, 'b>() -> Arg<'a, 'b> {
     .takes_value(true)
 }
 
+fn minify_arg<'a, 'b>() -> Arg<'a, 'b> {
+  Arg::with_name("minify")
+    .long("minify")
+    .help("Minify generated JavaScript")
+}
+
 fn ca_file_arg_parse(flags: &mut Flags, matches: &clap::ArgMatches) {
   flags.ca_file = matches.value_of("cert").map(ToOwned::to_owned);
+}
+
+fn minify_arg_parse(flags: &mut Flags, matches: &clap::ArgMatches) {
+  if matches.is_present("minify") {
+    flags.minify = true;
+  }
 }
 
 fn inspect_args<'a, 'b>(app: App<'a, 'b>) -> App<'a, 'b> {

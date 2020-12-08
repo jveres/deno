@@ -27,6 +27,7 @@ pub struct EmitConfigOptions {
   pub jsx: String,
   pub jsx_factory: String,
   pub jsx_fragment_factory: String,
+  pub minify: bool,
 }
 
 /// A structure that represents a set of options that were ignored and the

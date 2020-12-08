@@ -207,6 +207,8 @@ pub struct EmitOptions {
   pub jsx_fragment_factory: String,
   /// Should JSX be transformed or preserved.  Defaults to `true`.
   pub transform_jsx: bool,
+  /// Should JS be minified.  Defaults to `false`.
+  pub minify: bool,
 }
 
 impl Default for EmitOptions {
@@ -218,6 +220,7 @@ impl Default for EmitOptions {
       jsx_factory: "React.createElement".into(),
       jsx_fragment_factory: "React.Fragment".into(),
       transform_jsx: true,
+      minify: false,
     }
   }
 }
@@ -233,6 +236,7 @@ impl From<tsc_config::TsConfig> for EmitOptions {
       jsx_factory: options.jsx_factory,
       jsx_fragment_factory: options.jsx_fragment_factory,
       transform_jsx: options.jsx == "react",
+      minify: options.minify,
     }
   }
 }
@@ -324,7 +328,7 @@ impl ParsedModule {
         &mut buf,
         Some(&mut src_map_buf),
       ));
-      let config = swc_ecmascript::codegen::Config { minify: false };
+      let config = swc_ecmascript::codegen::Config { minify: options.minify };
       let mut emitter = swc_ecmascript::codegen::Emitter {
         cfg: config,
         comments: Some(&self.comments),

@@ -575,6 +575,8 @@ pub struct BundleOptions {
   /// file that augments the the default configuration passed to the TypeScript
   /// compiler.
   pub maybe_config_path: Option<String>,
+  //// Shall be JavaScript minified
+  pub minify: bool,
 }
 
 #[derive(Debug, Default)]
@@ -635,6 +637,8 @@ pub struct TranspileOptions {
   /// Ignore any previously emits and ensure that all files are emitted from
   /// source.
   pub reload: bool,
+  /// Shall JS be minified
+  pub minify: bool,
 }
 
 /// A dependency graph of modules, were the modules that have been inserted via
@@ -707,9 +711,14 @@ impl Graph {
       "jsx": "react",
       "jsxFactory": "React.createElement",
       "jsxFragmentFactory": "React.Fragment",
+      "minify": false,
     }));
     let maybe_ignored_options =
       ts_config.merge_tsconfig(options.maybe_config_path)?;
+
+    ts_config.merge(&json!({
+      "minify": options.minify,
+    }));
 
     let s = self.emit_bundle(&root_specifier, &ts_config.into())?;
     let stats = Stats(vec![
@@ -1002,8 +1011,9 @@ impl Graph {
       .context("Unable to output bundle during Graph::bundle().")?;
     let mut buf = Vec::new();
     {
+      debug!("emit_options.minify={}", emit_options.minify);
       let mut emitter = swc_ecmascript::codegen::Emitter {
-        cfg: swc_ecmascript::codegen::Config { minify: false },
+        cfg: swc_ecmascript::codegen::Config { minify: emit_options.minify },
         cm: cm.clone(),
         comments: None,
         wr: Box::new(swc_ecmascript::codegen::text_writer::JsWriter::new(
@@ -1434,6 +1444,7 @@ impl Graph {
       "jsx": "react",
       "jsxFactory": "React.createElement",
       "jsxFragmentFactory": "React.Fragment",
+      "minify": options.minify,
     }));
 
     let maybe_ignored_options =

@@ -148,6 +148,7 @@ impl ProgramState {
           debug,
           maybe_config_path,
           reload: self.flags.reload,
+          minify: self.flags.minify,
         })?;
       debug!("{}", stats);
       if let Some(ignored_options) = maybe_ignored_options {
